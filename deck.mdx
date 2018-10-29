@@ -1,6 +1,6 @@
-import { Head } from 'mdx-deck'
-
-export { book as theme } from 'mdx-deck/themes'
+import { Head, Appear, Image } from 'mdx-deck'
+export { components } from "mdx-deck-code-surfer"
+export { default as theme } from './theme'
 
 <Head>
   <title>Redux + Rematch</title>
@@ -14,11 +14,63 @@ Comment gérer un état qui n'en finit pas de grossir
 
 ---
 
-# Point de départ
+# Gestion de l'état
 
-* on support react connu
+<ul>
+  <Appear>
+    <li>user</li>
+    <li>language</li>
+  </Appear>
+</ul>
 
 ---
+
+```jsx Prop drilling
+import React from 'react'
+
+const Card = ({theme, title, image}) => (
+  <div className={`card card--${theme}`}>
+    <CardImage image={image}/>
+    <CardTitle title={title}/>
+  </div>
+)
+
+const Panel = ({theme, cards}) => (
+  <div className={`panel panel--${theme}`}>
+    {cards.map(c => <Card theme={theme} title={c.title} image={c.image}/>)}
+  </div>
+)
+
+class App extends React.Component {
+  static state = {
+    theme: 'dark'
+  }
+
+  switchTheme = (theme) => this.setState({theme});
+
+  render(){
+    const { theme } = this.state;
+    const { children } = this.props;
+    return (
+      <div className="container">
+        <Sidebar theme={theme} switchTheme={switchTheme}/>
+        <Content theme={theme}>
+          {children}
+        </Content>
+      </div>
+    )
+  }
+}
+----
+*
+3:8
+10:14
+16:36
+*
+```
+
+---
+
 
 Bref rappel du pourquoi redux, en une slide de code avec un state ingérable
 
@@ -27,15 +79,50 @@ Bref rappel du pourquoi redux, en une slide de code avec un state ingérable
 
 ---
 
-On n'a pas besoin de Redux
+```jsx \#NoRedux
+import React from 'react'
 
-* nouvelle api context pour répondre au problème de prop drilling
+const ThemeContext = React.createContext('dark')
+
+class App extends React.Component {
+  render() {
+    return (
+      <ThemeContext.Provider value="dark">
+        <Toolbar />
+      </ThemeContext.Provider>
+    );
+  }
+}
+
+function Toolbar(props) {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  );
+}
+
+class ThemedButton extends React.Component {
+  static contextType = ThemeContext;
+  render() {
+    return <Button theme={this.context} />;
+  }
+}
+----
+*
+3 > API context
+5:13
+8,10 > Context.Provider
+15:21
+18 > Pas de theme ici
+23:28
+24,26 > contextType (React 16.6)
+*
+```
 
 ---
 
-## Redux = Code applicatif !!!!!
-
-Pas dans les libs !
+# Redux === Code applicatif
 
 ---
 
@@ -51,8 +138,7 @@ Concepts de base de redux
 
 ---
 
-Data flow unidirectionnel
-(cf. mec de cycle avec ses diagrammes)
+<Image src="https://staltz.com/img/redux-unidir-ui-arch.jpg" size="contain"/>
 
 ---
 
