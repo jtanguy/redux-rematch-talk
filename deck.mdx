@@ -1,23 +1,149 @@
 import { Head } from 'mdx-deck'
 
-export { default as theme } from './theme'
+export { book as theme } from 'mdx-deck/themes'
 
 <Head>
-  <title>Presentation Title</title>
+  <title>Redux + Rematch</title>
+  <meta name="author" title="Julien Tanguy"/>
+  <meta name='twitter:site' content='@jutanguy' />
 </Head>
 
-# Hello
+# Redux + Rematch
+
+Comment gérer un état qui n'en finit pas de grossir
 
 ---
 
-## Edit this file
+# Point de départ
 
-To create your presentation
-
-```notes
-- Create speaker notes in fenced code blocks
-```
+* on support react connu
 
 ---
 
-<https://github.com/jxnblk/mdx-deck>
+Bref rappel du pourquoi redux, en une slide de code avec un state ingérable
+
+* Prop drilling
+* composition d'états
+
+---
+
+On n'a pas besoin de Redux
+
+* nouvelle api context pour répondre au problème de prop drilling
+
+---
+
+## Redux = Code applicatif !!!!!
+
+Pas dans les libs !
+
+---
+
+Concepts de base de redux
+
+* (commencer à parler d'évènements/de faits passés)
+* actions
+* reducers
+* store: getState + dispatch
+* devtools
+
+3-4 slides
+
+---
+
+Data flow unidirectionnel
+(cf. mec de cycle avec ses diagrammes)
+
+---
+
+Utilisation avec React
+
+* Connect
+* container vs components
+
+---
+
+## asynchrone
+
+* redux thunk
+
+* je ne parlerai pas des sagas
+
+
+---
+Instant protip
+
+* redux-api-middleware non, et pourquoi (mélange de commandes et d'events, middleware)
+
+* redux-form non, et pourquoi
+
+--- 
+
+Overdose de verbosité
+
+* trop d'action creators
+* et de
+* code
+* dans pleins de fichiers
+
+--- 
+
+Instant protip
+
+containers vs components => screens et components/ui
+
+---
+
+## redux ducks
+
+https://github.com/erikras/ducks-modular-redux
+
+
+---
+
+## Tests
+
+jest
+
+--- 
+
+## rematch
+
+https://hackernoon.com/redesigning-redux-b2baee8b8a38
+
+rematch = ducks + thunk 
+
+
+---
+
+## eventsourcing
+
+* Bien insister sur le concept d'évènement, de fait passé
+* parallèle effect/command
+
+---
+
+## Instant protiop
+
+* revenir dans les devtools
+
+
+---
+
+## Exemple boite de commentaire
+
+mini formulaire: add + edit
+
+* import/export
+
+Historique ?
+
+BOOM! même import
+
+
+
+---
+# Liens
+
+* <https://redux.js.org>
+* Rematch

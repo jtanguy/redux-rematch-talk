@@ -1,7 +1,12 @@
-import theme from 'mdx-deck/themes'
+import { dark as theme } from 'mdx-deck/themes'
+import nightOwl from "prism-react-renderer/themes/nightOwl"
 
 export default {
   ...theme,
+  codeSurfer: {
+    ...nightOwl,
+    showNumbers: true
+  }
 
   // Customize your presentation theme here.
   //
