@@ -1,6 +1,7 @@
-import { Head, Appear, Image } from 'mdx-deck'
+import { Head, Appear, Image, Notes } from 'mdx-deck'
 export { components } from "mdx-deck-code-surfer"
 export { default as theme } from './theme'
+import Simple from './samples/simple.js'
 
 <Head>
   <title>Redux + Rematch</title>
@@ -14,72 +15,117 @@ Comment gérer un état qui n'en finit pas de grossir
 
 ---
 
-# Gestion de l'état
+# Application
 
-<ul>
-  <Appear>
-    <li>user</li>
-    <li>language</li>
-  </Appear>
+<ul style={{textAlign: 'left'}}>
+<li> Profil utilisateur </li>
+<li> Messages </li>
+<li> Objets métier </li>
+<Appear>
+<li> Préférences </li>
+<li> Chat </li>
+<li> Nouveaux objets métier </li>
+<li> Fusion de plusieurs objets </li>
+</Appear>
 </ul>
 
+<Notes>
+
+Prenons une application classique.
+
+Elle grandit et grandit et grandit
+
+</Notes>
+
 ---
 
-```jsx Prop drilling
-import React from 'react'
+![](images/redux-light.png)
 
-const Card = ({theme, title, image}) => (
-  <div className={`card card--${theme}`}>
-    <CardImage image={image}/>
-    <CardTitle title={title}/>
-  </div>
-)
+---
 
-const Panel = ({theme, cards}) => (
-  <div className={`panel panel--${theme}`}>
-    {cards.map(c => <Card theme={theme} title={c.title} image={c.image}/>)}
-  </div>
-)
+<Image src="https://staltz.com/img/redux-unidir-ui-arch.jpg" size="contain"/>
 
-class App extends React.Component {
-  static state = {
-    theme: 'dark'
-  }
+---
 
-  switchTheme = (theme) => this.setState({theme});
+# Concepts
 
-  render(){
-    const { theme } = this.state;
-    const { children } = this.props;
-    return (
-      <div className="container">
-        <Sidebar theme={theme} switchTheme={switchTheme}/>
-        <Content theme={theme}>
-          {children}
-        </Content>
-      </div>
-    )
+---
+
+## Actions
+
+* `{type: 'COMMENT_ADDED', id: 'M927q6hd5', content: 'First!'}`
+* `{type: 'COMMENT_ADDED', id: 'eqVFsAUsEC', content: 'First!'}`
+* `{type: 'COMMENT_EDITED', id: 'eqVFsAUsEC', content: 'Second, actually'}`
+* `{type: 'COMMENT_REMOVED', id: 'eqVFsAUsEC'}`
+
+
+<Notes>
+
+Les actions sont les éléments de base de redux
+
+Ce sont des objets avec une clé `type`
+</Notes>
+
+---
+
+```js Reducers
+const initialState = []
+
+export default function reducer(state = initialState, action){
+  switch(action.type){
+    case 'COMMENT_ADDED':
+      return [...state, {id: action.id, content: action.content}]
+    case 'COMMENT_EDITED':
+      return state.map(comment => {
+        if(comment.id === action.id){
+          return ({id: comment.id, content: action.content})
+        } else {
+          return comment
+        }
+      })
+    case 'COMMENT_REMOVED':
+      return state.filter(comment => comment.id !== action.id)
+    default:
+      return state
   }
 }
-----
-*
-3:8
-10:14
-16:36
-*
 ```
 
----
-
-
-Bref rappel du pourquoi redux, en une slide de code avec un state ingérable
-
-* Prop drilling
-* composition d'états
+<Notes>
+Reducers, ou reducer functions
+</Notes>
 
 ---
 
-```jsx \#NoRedux
+## Store
+
+
+---
+
+
+<Simple/>
+
+
+---
+
+# Redux === Code applicatif
+
+---
+
+Utilisation avec React
+
+* Connect
+* container vs components
+
+---
+
+> “You might not need Redux”
+
+– Dan Abramov
+
+---
+
+```jsx Use the Context, Luke
 import React from 'react'
 
 const ThemeContext = React.createContext('dark')
@@ -119,33 +165,6 @@ class ThemedButton extends React.Component {
 24,26 > contextType (React 16.6)
 *
 ```
-
----
-
-# Redux === Code applicatif
-
----
-
-Concepts de base de redux
-
-* (commencer à parler d'évènements/de faits passés)
-* actions
-* reducers
-* store: getState + dispatch
-* devtools
-
-3-4 slides
-
----
-
-<Image src="https://staltz.com/img/redux-unidir-ui-arch.jpg" size="contain"/>
-
----
-
-Utilisation avec React
-
-* Connect
-* container vs components
 
 ---
 
