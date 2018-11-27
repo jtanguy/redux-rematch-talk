@@ -1,0 +1,112 @@
+= Redux, Rematch, et plus si affinités
+Julien Tanguy
+2018-11-25
+
+Adressons l'éléphant dans la pièce: il est très difficile de passer à côté de Redux en faisant du React.
+
+Dans ce talk nous verrons les bases de cette lib, et les raisons pour lesquelles elle est si attractive pour
+beaucoup.
+
+Nous verrons également des outils, des approches et des techniques pour mieux gérer la complexité de la gestion de
+l'état d'une application Web.
+
+== Présentation
+
+Bonjour, je m'appelle Julien Tanguy.
+
+Je bosse pour Valwin
+
+
+On recrute ;)
+
+
+== Le problème
+
+* Gérer un état applicatif qui n'en finit pas de grossir
+* Collaborer à plusieurs
+* Testabilité
+* Reviewabilité
+
+== NoRedux
+
+* Local state is fine
+* Context
+* GraphQL/Apollo
+
+=== Limites du state local
+
+* Besoin de coordonner plusieurs composants
+* Besoin d'une unique source de vérité
+* Mises à jour complexes de l'état
+* Partie de l'état calculé
+
+== Redux
+
+Trois principes
+
+* Unique source de vérité
+* État en lecture seule
+* Les changements sont faits avec des fonctions pures
+
+=== Concepts fondamentaux
+
+* Actions
+* Reducers
+* Store
+
+==== Actions
+
+Objets avec une clé `type`, décrivant des changements passés.
+
+==== Reducers
+
+Fonctions permettant d'aggréger ce qui s'est passé dans un état
+
+==== Store
+
+* Encapsule l'état
+* Fournit les actions pour interroger l'état et dispatcher les actions
+
+=== Redux recap
+
+* _You might not need Redux_
+* Redux = Code applicatif
+
+== Testing redux
+
+Talk de Sylvain Bannier
+
+* Testing action creators
+* Simple test reducer
+* Smart test reducer (snapshot-diff)
+
+
+== Effets
+
+* Thunk
+* Sagas
+* Observables
+
+== Advanced Redux
+
+=== Normaliser son état
+
+* Normalizr
+* Reselect
+
+=== Middlewares
+
+
+== Architecture
+
+* Containers vs components
+* Better: Screens vs components
+* You don't need to split everything
+
+=== Redux ducks
+
+Idée: consolider l'état en modules indépendants
+
+=== Rematch
+
+Idée: Conventions pour simplifier Redux

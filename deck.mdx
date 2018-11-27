@@ -4,124 +4,74 @@ export { default as theme } from './theme'
 import Simple from './samples/simple.js'
 
 <Head>
-  <title>Redux + Rematch</title>
+  <title>Redux, Rematch, et plus si affinités</title>
   <meta name="author" title="Julien Tanguy"/>
   <meta name='twitter:site' content='@jutanguy' />
 </Head>
 
-# Redux + Rematch
-
-Comment gérer un état qui n'en finit pas de grossir
+# Redux, Rematch, et plus si affinités
 
 ---
 
-# Application
+# @jutanguy
+
+---
+
+![Valwin](images/valwin.png)
+
+<https://www.welcometothejungle.co/companies/valwin/jobs>
+
+---
+
+# ~~Progressive~~Big Web App
+
+
+---
+
+## Application
 
 <ul style={{textAlign: 'left'}}>
-<li> Profil utilisateur </li>
-<li> Messages </li>
-<li> Objets métier </li>
-<Appear>
-<li> Préférences </li>
-<li> Chat </li>
-<li> Nouveaux objets métier </li>
-<li> Fusion de plusieurs objets </li>
-</Appear>
+  <li> Profil utilisateur </li>
+  <li> Messages </li>
+  <li> Objets métier </li>
+  <Appear>
+    <li> Préférences </li>
+    <li> Chat </li>
+    <li> Nouveaux objets métier </li>
+    <li> Fusion de plusieurs objets </li>
+    <li> etc. </li>
+  </Appear>
 </ul>
 
-<Notes>
+---
 
-Prenons une application classique.
-
-Elle grandit et grandit et grandit
-
-</Notes>
+# NoRedux
 
 ---
 
-![](images/redux-light.png)
-
----
-
-<Image src="https://staltz.com/img/redux-unidir-ui-arch.jpg" size="contain"/>
-
----
-
-# Concepts
-
----
-
-## Actions
-
-* `{type: 'COMMENT_ADDED', id: 'M927q6hd5', content: 'First!'}`
-* `{type: 'COMMENT_ADDED', id: 'eqVFsAUsEC', content: 'First!'}`
-* `{type: 'COMMENT_EDITED', id: 'eqVFsAUsEC', content: 'Second, actually'}`
-* `{type: 'COMMENT_REMOVED', id: 'eqVFsAUsEC'}`
-
-
-<Notes>
-
-Les actions sont les éléments de base de redux
-
-Ce sont des objets avec une clé `type`
-</Notes>
-
----
-
-```js Reducers
-const initialState = []
-
-export default function reducer(state = initialState, action){
-  switch(action.type){
-    case 'COMMENT_ADDED':
-      return [...state, {id: action.id, content: action.content}]
-    case 'COMMENT_EDITED':
-      return state.map(comment => {
-        if(comment.id === action.id){
-          return ({id: comment.id, content: action.content})
-        } else {
-          return comment
-        }
-      })
-    case 'COMMENT_REMOVED':
-      return state.filter(comment => comment.id !== action.id)
-    default:
-      return state
-  }
-}
-```
-
-<Notes>
-Reducers, ou reducer functions
-</Notes>
-
----
-
-## Store
-
-
----
-
-
-<Simple/>
-
-
----
-
-# Redux === Code applicatif
-
----
-
-Utilisation avec React
-
-* Connect
-* container vs components
-
----
-
-> “You might not need Redux”
+> “Local state is fine”
 
 – Dan Abramov
+
+---
+
+```jsx Local state
+import React from 'react'
+
+function Counter({initialCount}) {
+  const [count, setCount] = useState(initialCount);
+  return (
+    <React.Fragment>
+      Count: {count}
+      <button onClick={() => setCount(0)}>Reset</button>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <button onClick={() => setCount(c => c - 1)}>-</button>
+    </React.Fragment>
+  );
+}
+----
+* > Using hooks ;)
+```
 
 ---
 
@@ -130,15 +80,11 @@ import React from 'react'
 
 const ThemeContext = React.createContext('dark')
 
-class App extends React.Component {
-  render() {
-    return (
-      <ThemeContext.Provider value="dark">
-        <Toolbar />
-      </ThemeContext.Provider>
-    );
-  }
-}
+const App = () => (
+  <ThemeContext.Provider value="dark">
+    <Toolbar />
+  </ThemeContext.Provider>
+);
 
 function Toolbar(props) {
   return (
@@ -157,98 +103,203 @@ class ThemedButton extends React.Component {
 ----
 *
 3 > API context
-5:13
-8,10 > Context.Provider
-15:21
-18 > Pas de theme ici
-23:28
-24,26 > contextType (React 16.6)
+5:9
+6,8 > Context.Provider
+11:17
+14 > Pas de theme ici
+19:24
+20,22 > contextType (React 16.6)
 *
 ```
 
 ---
 
-## asynchrone
-
-* redux thunk
-
-* je ne parlerai pas des sagas
-
-
----
-Instant protip
-
-* redux-api-middleware non, et pourquoi (mélange de commandes et d'events, middleware)
-
-* redux-form non, et pourquoi
-
---- 
-
-Overdose de verbosité
-
-* trop d'action creators
-* et de
-* code
-* dans pleins de fichiers
-
---- 
-
-Instant protip
-
-containers vs components => screens et components/ui
+![Apollographql](images/apollo.svg)
 
 ---
 
-## redux ducks
+## Limites du state local
 
-https://github.com/erikras/ducks-modular-redux
-
-
----
-
-## Tests
-
-jest
-
---- 
-
-## rematch
-
-https://hackernoon.com/redesigning-redux-b2baee8b8a38
-
-rematch = ducks + thunk 
-
+<ul style={{textAlign: 'left'}}>
+  <Appear>
+  <li> Besoin de coordonner plusieurs composants </li>
+  <li> Besoin d'une unique source de vérité </li>
+  <li> Mises à jour complexes de l'état </li>
+  <li> Une partie de l'état est calculé </li>
+  </Appear>
+</ul>
 
 ---
 
-## eventsourcing
+![](images/redux-dark.png)
 
-* Bien insister sur le concept d'évènement, de fait passé
-* parallèle effect/command
-
----
-
-## Instant protiop
-
-* revenir dans les devtools
-
+<https://redux.js.org>
 
 ---
 
-## Exemple boite de commentaire
+# Les trois principes de Redux
 
-mini formulaire: add + edit
-
-* import/export
-
-Historique ?
-
-BOOM! même import
-
-
+* Unique source de vérité
+* État en lecture seule
+* Les changements sont faits avec des fonctions pures
 
 ---
+
+## Concepts fondamentaux
+
+* Actions
+* Reducers
+* Store
+
+---
+
+### Action
+
+Objet avec une clé `type`, décrivant un ou des changements passés.
+
+`
+{ type: 'TODO_ADDED', text: 'Go to swimming pool'}
+`
+
+---
+
+```js Action creator
+export const addTodo = (text) => ({ type: 'TODO_ADDED', id: newUUID(), text: text })
+----
+* > Fonction qui retourne une action.
+```
+
+---
+
+### Reducer
+
+Fonction permettant d'aggréger ce qui s'est passé dans un état
+
+---
+
+```js Reducer
+const initialState = [];
+
+export default function reducer(state = initialState, action){
+  switch(action.type){
+    case 'TODO_ADDED':
+      return [...state, {id: action.id, text: action.text}];
+    case 'TODO_EDITED':
+      return state.map(t => t.id === action.id ?
+        ({id: t.id, text: action.text}) : t
+      );
+    case 'TODO_REMOVED':
+      return state.filter(t => t.id !== action.id);
+    default:
+      return state;
+  }
+}
+----
+*
+1 > Initial state
+3 > reducer : (state, action) → state
+4,15 > switch
+5:6
+7:10
+11:12
+13:14 > Toujours retourner un état
+*
+```
+
+---
+
+### Store
+
+* Encapsule l'état
+* Fournit les actions pour interroger l'état et dispatcher les actions
+
+---
+
+```jsx Store
+import { createStore } from 'redux';
+import todoReducer, { addTodo } from './reducers';
+
+const store = createStore(todoReducer, window.STATE_FROM_SERVER)
+
+console.log(store.getState())
+
+store.dispatch(addTodo('Tester redux'))
+
+console.log(store.getState())
+----
+*
+1 > Redux, pas react-redux
+4 > createStore(reducer)
+*
+```
+
+<Notes>
+Real code ?
+</Notes>
+
+---
+
+## Redux recap
+
+> “You might not need Redux”
+
+– Dan Abramov
+
+---
+
+# Redux === Code applicatif
+
+---
+
+## Redux & Tests
+
+Meetup 2: “Ceintures, bretelles et stratégies de test” par Sylvain Bannier
+
+---
+
+```js Actions creators & Tests
+import { addTodo } from './reducers';
+
+describe('actions', () => {
+  it('should create a TODO', () => {
+    const text = "Test action";
+    const action = addTodo(text);
+    expect(action).toHaveProperty('type', 'TODO_ADDED');
+    expect(action).toHaveProperty('text', text);
+  });
+
+  it('should create TODOs with different ids', () => {
+    const text = "Test action";
+    const action1 = addTodo(text);
+    const action2 = addTodo(text);
+    expect(action2).not.toEqual(action1);
+  });
+});
+----
+*
+```
+
+---
+
+```js Reducers & Tests
+import reducer, { addTodo } from './reducers';
+
+describe('reducer', () => {
+  it('comes with an initial state', () => {
+    expect(reducer(undefined)).toMatchSnapshot();
+  });
+  it('should apply actions', () => {
+    const newState = reducer(undefined, addTodo("Tester le reducer"));
+    expect(newState).toHaveLength(1);
+  });
+});
+----
+*
+```
+
+---
+
 # Liens
 
 * <https://redux.js.org>
-* Rematch
+* <https://rematch.gitbooks.io>
