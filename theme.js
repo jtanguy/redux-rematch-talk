@@ -1,9 +1,41 @@
 // @format
+import React from 'react';
 import theme from 'mdx-deck/themes';
 import prismStyle from 'react-syntax-highlighter/styles/prism/duotone-light';
 
+class Provider extends React.Component {
+  render() {
+    const {children, mode, index, length, update} = this.props;
+
+    if (mode !== 'NORMAL') {
+      return <React.Fragment>{children}</React.Fragment>;
+    }
+
+    return (
+      <React.Fragment>
+        {children}
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            right: '0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <span>
+            {index + 1}/{length}
+          </span>
+        </div>
+      </React.Fragment>
+    );
+  }
+}
+
 export default {
   ...theme,
+  Provider,
   font: "'Futura Md BT', 'Average Sans', sans-serif",
   monospace: "'Source Code Pro', monospace",
   colors: {
