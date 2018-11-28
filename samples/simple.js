@@ -1,6 +1,7 @@
 // @format
 import React from 'react';
 import {createStore, combineReducers} from 'redux';
+import {composeWithDevTools} from 'redux-devtools-extension';
 import {Provider, connect} from 'react-redux';
 import shortid from 'shortid';
 
@@ -29,8 +30,7 @@ const store = createStore(
   combineReducers({
     todos: todoReducer,
   }),
-  window.__REDUX_DEVTOOLS_EXTENSION__ &&
-    window.__REDUX_DEVTOOLS_EXTENSION__({name: 'Simple'}),
+  composeWithDevTools({name: 'Simple'})(),
 );
 
 const App = ({todos, addTodo}) => (

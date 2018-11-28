@@ -14,11 +14,13 @@
   "license": "MIT",
   "devDependencies": {
     "css-loader": "^1.0.1",
+    "file-loader": "^2.0.0",
     "mdx-deck": "^1.6.7",
     "mdx-deck-code-surfer": "^0.5.3",
     "prism": "^4.1.2",
     "prism-react-renderer": "^0.1.4",
-    "react-syntax-highlighter": "^9.0.1"
+    "react-syntax-highlighter": "^9.0.1",
+    "url-loader": "^1.1.2"
   },
   "name": "redux-rematch",
   "dependencies": {
@@ -27,6 +29,7 @@
     "react-redux": "^5.1.0",
     "react-twitter-widgets": "^1.7.1",
     "redux": "^4.0.1",
+    "redux-devtools-extension": "^2.13.7",
     "shortid": "^2.2.13"
   }
 }
