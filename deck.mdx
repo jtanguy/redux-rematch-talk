@@ -1,7 +1,8 @@
 import { Head, Appear, Image, Notes } from 'mdx-deck'
 export { components } from "mdx-deck-code-surfer"
 export { default as theme } from './theme'
-import Simple from './samples/simple.js'
+import { Tweet } from 'react-twitter-widgets'
+import Code from 'mdx-code'
 
 <Head>
   <title>Redux, Rematch, et plus si affinités</title>
@@ -23,7 +24,7 @@ import Simple from './samples/simple.js'
 
 ---
 
-# ~~Progressive~~Big Web App
+# Progressive Web App
 
 
 ---
@@ -32,7 +33,6 @@ import Simple from './samples/simple.js'
 
 <ul style={{textAlign: 'left'}}>
   <li> Profil utilisateur </li>
-  <li> Messages </li>
   <li> Objets métier </li>
   <Appear>
     <li> Préférences </li>
@@ -42,6 +42,10 @@ import Simple from './samples/simple.js'
     <li> etc. </li>
   </Appear>
 </ul>
+
+---
+
+# ~~Progressive~~Big Web App
 
 ---
 
@@ -215,7 +219,7 @@ export default function reducer(state = initialState, action){
 
 ---
 
-```jsx Store
+```js Store
 import { createStore } from 'redux';
 import todoReducer, { addTodo } from './reducers';
 
@@ -233,13 +237,198 @@ console.log(store.getState())
 *
 ```
 
-<Notes>
-Real code ?
-</Notes>
+---
+
+export default Code
+
+```
+const { createStore } = require('redux');
+const newUUID = require('uuid/v4');
+
+const addTodo = (text) => ({ type: 'TODO_ADDED', id: newUUID(), text: text })
+function todoReducer(state = [], action){
+  switch(action.type){
+    case 'TODO_ADDED':
+      return [...state, {id: action.id, text: action.text}];
+    case 'TODO_EDITED':
+      return state.map(t => t.id === action.id ?
+        ({id: t.id, text: action.text}) : t
+      );
+    case 'TODO_REMOVED':
+      return state.filter(t => t.id !== action.id);
+    default:
+      return state;
+  }
+}
+```
+```javascript Store
+const store = createStore(todoReducer)
+
+console.log(store.getState())
+
+store.dispatch(addTodo('Tester redux'))
+
+console.log(store.getState())
+```
+
+
+---
+
+```jsx Middleware
+import { createStore, applyMiddleware } from 'redux';
+import todoReducer, { addTodo } from './reducers';
+
+
+const logger = store => next => action => {
+  console.group(action.type);
+  console.log('action: ', action);
+  const result = next(action);
+  console.log('next state: ', store.getState());
+  console.groupEnd();
+  return result;
+}
+
+const store = createStore(todoReducer, window.STATE_FROM_SERVER, applyMiddleware(logger))
+
+store.dispatch(addTodo('Tester redux'))
+----
+*
+1 > import applyMiddleware
+5:12 > middleware : store → dispatch → action → state
+14 > createStore with applyMiddleware
+```
+
+---
+
+export default Code
+
+```
+const { createStore, applyMiddleware } = require('redux');
+const newUUID = require('uuid/v4');
+
+const addTodo = (text) => ({ type: 'TODO_ADDED', id: newUUID(), text: text })
+function todoReducer(state = [], action){
+  switch(action.type){
+    case 'TODO_ADDED':
+      return [...state, {id: action.id, text: action.text}];
+    case 'TODO_EDITED':
+      return state.map(t => t.id === action.id ?
+        ({id: t.id, text: action.text}) : t
+      );
+    case 'TODO_REMOVED':
+      return state.filter(t => t.id !== action.id);
+    default:
+      return state;
+  }
+}
+```
+```javascript Logger Middleware
+const logger = store => next => action => {
+  console.group(action.type);
+  console.log('action: ', action);
+  const result = next(action);
+  console.log('next state: ', store.getState());
+  console.groupEnd();
+  return result;
+}
+
+const store = createStore(todoReducer, applyMiddleware(logger))
+
+store.dispatch(addTodo('Tester redux'))
+```
+
+---
+
+## Utilisation avec react
+
+---
+
+```jsx index.js
+import React from 'react'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import createStore from './store'
+import App from './components/App'
+
+const store = createStore();
+
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
+----
+*
+3 > import Provider
+7,10:12 > store en props
+```
+
+---
+
+```jsx app.js
+import React from 'react';
+import { connect } form 'react-redux';
+
+const App = ({ todos, addTodo }) => (
+  <div>
+    <ul>
+      { todos.map(t => (
+        <li key={t.id}>{t.text}</li>
+      ))}
+    </ul>
+    <form key={todos.length} onSubmit={e => addTodo(e.target.elements.content.value)}>
+      <input type="text" name="content" />
+      <input type="submit" value="New" />
+    </form>
+  </div>
+);
+
+const mapReduxStateToProps = state => ({
+  todos: state.todos
+});
+const mapDispatchedActionsToProps = dispatch => ({
+  addTodo: content => dispatch(addTodo(content))
+});
+export default connect(mapReduxStateToProps, mapDispatchedActionsToProps)(App)
+----
+*
+4:16 > Composant normal, avec props
+2 > import connect
+18:24 > use connect
+18:20 > mapStateToProps : state → props
+21:23 > mapDispatchToProps : dispatch → props
+*
+```
+
+---
+
+
+import Simple from 'samples/simple'
+
+<Simple />
 
 ---
 
 ## Redux recap
+
+<ul style={{textAlign: 'left'}}>
+  <Appear>
+  <li>Actions</li>
+  <li>Reducer</li>
+  <li>Store</li>
+  <li>Middleware</li>
+  <li>connect</li>
+  </Appear>
+</ul>
+
+
+---
+
+
+<Image src="https://staltz.com/img/redux-unidir-ui-arch.jpg" size="contain"/>
+
+---
 
 > “You might not need Redux”
 
@@ -253,7 +442,7 @@ Real code ?
 
 ## Redux & Tests
 
-Meetup 2: “Ceintures, bretelles et stratégies de test” par Sylvain Bannier
+Meetup 2: _“Ceintures, bretelles et stratégies de test”_ par Sylvain Bannier
 
 ---
 
@@ -299,7 +488,467 @@ describe('reducer', () => {
 
 ---
 
+```js Reducers & Tests 2
+import reducer, { addTodo } from './reducers';
+import diff from 'snapshot-diff';
+
+
+describe('reducer', () => {
+  it('comes with an initial state', () => {
+    expect(reducer(undefined)).toMatchSnapshot();
+  });
+  it('should apply actions', () => {
+    const initialState = reducer(undefined);
+    const newState = reducer(initialState, addTodo("Tester le reducer"));
+    expect(diff(initialState, newState)).toMatchSnapshot();
+  });
+});
+----
+*
+```
+
+---
+
+## Gestion des effets
+
+Comment faire des appels à des APIs ?
+
+<ul style={{textAlign: 'left'}}>
+  <Appear>
+  <li>redux-thunk</li>
+  <li>redux-promise</li>
+  <li>redux-observable</li>
+  <li>redux-saga</li>
+  <li><s>redux-api-middleware</s></li>
+  </Appear>
+</ul>
+
+---
+
+```js redux-thunk
+function createThunkMiddleware(extraArgument) {
+  return ({ dispatch, getState }) => next => action => {
+    if (typeof action === 'function') {
+      return action(dispatch, getState, extraArgument);
+    }
+
+    return next(action);
+  };
+}
+
+const thunk = createThunkMiddleware();
+thunk.withExtraArgument = createThunkMiddleware;
+
+export default thunk;
+----
+* 
+```
+
+---
+
+```js redux-promise
+import isPromise from 'is-promise';
+import { isFSA } from 'flux-standard-action';
+
+export default function promiseMiddleware({ dispatch }) {
+  return next => action => {
+    if (!isFSA(action)) {
+      return isPromise(action) ? action.then(dispatch) : next(action);
+    }
+
+    return isPromise(action.payload)
+      ? action.payload
+          .then(result => dispatch({ ...action, payload: result }))
+          .catch(error => {
+            dispatch({ ...action, payload: error, error: true });
+            return Promise.reject(error);
+          })
+      : next(action);
+  };
+}
+----
+*
+```
+
+---
+
+### redux-observable
+
+Je n'ai pas eu l'occasion de tester
+
+---
+
+### redux-saga
+
+Je n'ai toujours pas saisi les _générateurs_ en js
+
+---
+
+### ~~redux-api-middleware~~
+
+---
+
+```js
+import { RSAA } from `redux-api-middleware`; // RSAA = '@@redux-api-middleware/RSAA'
+
+{
+  [RSAA]: {
+    endpoint: 'http://www.example.com/api/users',
+    method: 'GET',
+    types: ['REQUEST', 'SUCCESS', 'FAILURE']
+  }
+}
+```
+
+---
+
+```json Request
+{
+  "type": "REQUEST"
+}
+----
+*
+```
+
+---
+
+```json Response
+{
+  "type": "SUCCESS",
+  "payload": {
+    "users": [
+      { "id": 1, "name": "John Doe" },
+      { "id": 2, "name": "Jane Doe" },
+    ]
+  }
+}
+----
+*
+```
+
+---
+
+### Problèmes avec redux-api-middleware
+
+* On perd le contrôle du flot d'actions
+* Comment faire
+
+---
+
+## Ma préférence: redux-thunk
+
+---
+
+# Advanced Redux
+
+---
+
+## Normalisation de l'état
+
+---
+
+```json Response
+{
+  "id": "123",
+  "author": {
+    "id": "1",
+    "name": "Paul"
+  },
+  "title": "My awesome blog post",
+  "comments": [
+    {
+      "id": "324",
+      "commenter": {
+        "id": "2",
+        "name": "Nicole"
+      }
+    }
+  ]
+}
+----
+*
+```
+
+---
+
+```js Normalizr
+import { normalize, schema } from 'normalizr';
+
+const user = new schema.Entity('users');
+
+const comment = new schema.Entity('comments', {
+  commenter: user,
+});
+
+const article = new schema.Entity('articles', {
+  author: user,
+  comments: [comment],
+});
+
+const normalizedData = normalize(data, article);
+----
+*
+1 > Import
+3,5,9 > Définition de schémas...
+6,10,11 > ... avec des relations
+14 > Normalisation
+*
+```
+
+---
+export default Code
+
+```
+const { normalize, schema } = require('normalizr');
+const data = ({
+  "id": "123",
+  "author": {
+    "id": "1",
+    "name": "Paul"
+  },
+  "title": "My awesome blog post",
+  "comments": [
+    {
+      "id": "324",
+      "commenter": {
+        "id": "2",
+        "name": "Nicole"
+      }
+    }
+  ]
+});
+```
+```javascript
+const user = new schema.Entity('users');
+
+const comment = new schema.Entity('comments', {
+  commenter: user,
+});
+
+const article = new schema.Entity('articles', {
+  author: user,
+  comments: [comment],
+});
+
+const normalizedData = normalize(data, article);
+```
+
+---
+
+## Architecture #protip
+
+La distinction entre _container_ et _component_ n'est pas forcément utile à refléter dans le _filesystem_
+
+---
+
+## Convention de nommage
+
+<https://hackernoon.com/structuring-projects-and-naming-components-in-react-1261b6e18d76>
+
+---
+
+```plain Better naming
+src
+├─ components
+│  ├─ User
+│  │ ├─ Form
+│  │ │ ├─ Form.jsx
+│  │ │ └─ Form.css
+│  │ └─ List.jsx
+│  └─ UI
+│
+└─ screens
+  ├─ User
+  │ ├─ Form.jsx
+  │ └─ List.jsx
+  └─ Root.jsx
+----
+*
+10 > Les écrans sont dans screens
+2 > Le reste dans components
+8 > Les composants génériques
+3:7 > Composants groupés par module/feature
+5 > class UserForm 
+7 > class UserList
+12 > route /user/form
+13 > route /user/list
+*
+```
+
+---
+
+## Les gros fichiers ne sont pas _nécessairement_ mauvais
+
+---
+
+<Tweet tweetId="1027245759232651270"/>
+
+---
+
+# move files around until it feels right
+
+---
+
+<Tweet tweetId="1027248875072114689"/>
+
+---
+
+## Redux ducks
+
+---
+
+```js redux/modules/todo.js
+import newUUID from 'uuid/v4';
+
+// Action types
+const ADDED = 'TODO_ADDED';
+const EDITED = 'TODO_EDITED';
+const REMOVED = 'TODO_REMOVED';
+
+// Reducer
+export default function reducer(state = [], action){
+  switch(action.type){
+    case 'TODO_ADDED':
+      return [...state, {id: action.id, text: action.text}];
+    case 'TODO_EDITED':
+      return state.map(t => t.id === action.id ?
+        ({id: t.id, text: action.text}) : t
+      );
+    case 'TODO_REMOVED':
+      return state.filter(t => t.id !== action.id);
+    default:
+      return state;
+  }
+}
+
+// Action creators
+export const todoAdded = (text, id) => ({ type: ADDED, id: id, text: text });
+
+export const addTodo = (text) => dispatch => axios
+  .post('/todo', { text: text, id: newUUID() })
+  .then(({text, id}) => dispatch(todoAdded(text,id)))
+----
+*
+3 > Action types
+8 > Default export reducer
+24 > Named exports action creators
+*
+```
+
+---
+
+## Redux _est_ verbeux
+
+* C'est normal, il n'a pas été conçu pour être concis
+* Best practices
+* Boilerplates
+
+---
+
+# Rematch
+
+![](images/rematch.svg)
+
+---
+
+## Rematch = Redux + Best practices
+
+<https://hackernoon.com/redesigning-redux-b2baee8b8a38>
+
+* redéclaration des types d'actions
+* _action creators_
+* _thunks_
+* création du store
+* _mapDispatchToProps_
+
+
+---
+
+```js redux duck
+import newUUID from 'uuid/v4';
+
+// Action types
+const ADDED = 'TODO_ADDED';
+
+// Reducer
+export default function reducer(state = [], action){
+  switch(action.type){
+    case 'TODO_ADDED':
+      return [...state, {id: action.id, text: action.text}];
+    default:
+      return state;
+  }
+}
+
+// Action creators
+export const todoAdded = (text, id) => ({ type: ADDED, id: id, text: text });
+
+export const addTodo = (text) => dispatch => axios
+  .post('/todo', { text: text, id: newUUID() })
+  .then(({text, id}) => dispatch(todoAdded(text,id)))
+
+// -------- store.js --------
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import thunk from 'redux-thunk';
+
+import todoReducer from './modules/todo';
+
+export default createStore(
+  combineReducers({
+    todos: todoReducer,
+  }),
+  applyMiddleware(thunk)
+);
+----
+*
+1:30 > duck
+4 > répétition des types
+17:21 > action creators
+23:34 > store
+24,27,30:32 > reducers
+25,33 > thunk
+```
+
+---
+
+```js Rematch
+import { init } from '@rematch/core'
+
+const todos = {
+  state: [],
+  reducers: {
+    added: (state, payload) => [...state, payload]
+  },
+  effects: (dispatch) => ({
+    async addTodo(payload) {
+      const todo = await axios.post('/todo', { text: text, id: newUUID() })
+      this.added(todo)
+    }
+  })
+}
+
+export default init({
+  models: { todos }
+})
+----
+*
+17 > models
+3:14 > model
+4 > initial state
+5:7 > pure reducer
+8:13 > effects (penser thunk)
+```
+
+---
+
+
+import Rematch from 'samples/rematch'
+
+<Rematch />
+
+---
+
 # Liens
 
 * <https://redux.js.org>
-* <https://rematch.gitbooks.io>
+* <https://rematch.gitbooks.io/rematch>
