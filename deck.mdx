@@ -4,6 +4,7 @@ export { default as theme } from './theme'
 import { Tweet } from 'react-twitter-widgets'
 import Code from 'mdx-code'
 
+
 <Head>
   <title>Redux, Rematch, et plus si affinités</title>
   <meta name="author" title="Julien Tanguy"/>
@@ -26,12 +27,7 @@ import valwin from "images/valwin.png"
 
 ---
 
-# Progressive Web App
-
-
----
-
-## Application
+# (Progressive) Web App
 
 <ul style={{textAlign: 'left'}}>
   <li> Profil utilisateur </li>
@@ -51,32 +47,33 @@ import valwin from "images/valwin.png"
 
 ---
 
-# NoRedux
-
----
-
 > “Local state is fine”
 
 – Dan Abramov
 
 ---
 
-```jsx Local state
+```jsx Local state #NoRedux
 import React from 'react'
 
-function Counter({initialCount}) {
-  const [count, setCount] = useState(initialCount);
-  return (
-    <React.Fragment>
-      Count: {count}
-      <button onClick={() => setCount(0)}>Reset</button>
-      <button onClick={() => setCount(c => c + 1)}>+</button>
-      <button onClick={() => setCount(c => c - 1)}>-</button>
-    </React.Fragment>
-  );
+class Counter extends React.Component {
+  static state = {
+    count: 0,
+  };
+
+  render() {
+    return (
+      <React.Fragment>
+        Count: {this.state.count}
+        <button onClick={() => this.setState({count:0})}>Reset</button>
+        <button onClick={() => this.setState(({count}) => ({count: count + 1}))}>+</button>
+        <button onClick={() => this.setState(({count}) => ({count: count - 1}))}>-</button>
+      </React.Fragment>
+    );
+  }
 }
 ----
-* > Using hooks ;)
+*
 ```
 
 ---
@@ -120,12 +117,6 @@ class ThemedButton extends React.Component {
 
 ---
 
-import apollo from 'images/apollo.svg'
-
-<img src={apollo}/>
-
----
-
 ## Limites du state local
 
 <ul style={{textAlign: 'left'}}>
@@ -153,8 +144,6 @@ import redux from 'images/redux-dark.png'
 * État en lecture seule
 * Les changements sont faits avec des fonctions pures
 
----
-
 ## Concepts fondamentaux
 
 * Actions
@@ -166,10 +155,6 @@ import redux from 'images/redux-dark.png'
 ### Action
 
 Objet avec une clé `type`, décrivant un ou des changements passés.
-
-`
-{ type: 'TODO_ADDED', text: 'Go to swimming pool'}
-`
 
 ---
 
@@ -345,11 +330,7 @@ store.dispatch(addTodo('Tester redux'))
 
 ---
 
-## Utilisation avec react
-
----
-
-```jsx index.js
+```jsx Utilisation avec react
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
@@ -413,6 +394,8 @@ export default connect(mapReduxStateToProps, mapDispatchedActionsToProps)(App)
 import Simple from 'samples/simple'
 
 <Simple />
+
+Devtools Redux > Simple
 
 ---
 
@@ -521,13 +504,34 @@ Comment faire des appels à des APIs ?
 
 <ul style={{textAlign: 'left'}}>
   <Appear>
-  <li>redux-thunk</li>
-  <li>redux-promise</li>
-  <li>redux-observable</li>
+  <li>redux-thunk (redux-promise)</li>
   <li>redux-saga</li>
   <li><s>redux-api-middleware</s></li>
   </Appear>
 </ul>
+
+---
+
+```js utilisation de redux-thunk
+const INCREMENT_COUNTER = 'INCREMENT_COUNTER';
+
+function increment() {
+  return {
+    type: INCREMENT_COUNTER
+  };
+}
+
+function incrementAsync() {
+  return dispatch => {
+    setTimeout(() => {
+      // Yay! Can invoke sync or async actions with `dispatch`
+      dispatch(increment());
+    }, 1000);
+  };
+}
+----
+*
+```
 
 ---
 
@@ -549,38 +553,6 @@ export default thunk;
 ----
 * 
 ```
-
----
-
-```js redux-promise
-import isPromise from 'is-promise';
-import { isFSA } from 'flux-standard-action';
-
-export default function promiseMiddleware({ dispatch }) {
-  return next => action => {
-    if (!isFSA(action)) {
-      return isPromise(action) ? action.then(dispatch) : next(action);
-    }
-
-    return isPromise(action.payload)
-      ? action.payload
-          .then(result => dispatch({ ...action, payload: result }))
-          .catch(error => {
-            dispatch({ ...action, payload: error, error: true });
-            return Promise.reject(error);
-          })
-      : next(action);
-  };
-}
-----
-*
-```
-
----
-
-### redux-observable
-
-Je n'ai pas eu l'occasion de tester
 
 ---
 
@@ -953,6 +925,15 @@ export default init({
 import Rematch from 'samples/rematch'
 
 <Rematch />
+
+Devtools Redux > Rematch
+
+---
+
+# Merci
+
+
+<https://www.welcometothejungle.co/companies/valwin/jobs>
 
 ---
 
